@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
 
+
 def create_ad(db: Session, ad: schemas.AdvertisementCreate):
     db_ad = models.Advertisement(**ad.dict())
     db.add(db_ad)
@@ -8,8 +9,10 @@ def create_ad(db: Session, ad: schemas.AdvertisementCreate):
     db.refresh(db_ad)
     return db_ad
 
+
 def get_ad(db: Session, ad_id: int):
     return db.query(models.Advertisement).filter(models.Advertisement.id == ad_id).first()
+
 
 def update_ad(db: Session, ad_id: int, ad_data: schemas.AdvertisementUpdate):
     ad = get_ad(db, ad_id)
@@ -23,6 +26,7 @@ def update_ad(db: Session, ad_id: int, ad_data: schemas.AdvertisementUpdate):
     db.refresh(ad)
     return ad
 
+
 def delete_ad(db: Session, ad_id: int):
     ad = get_ad(db, ad_id)
     if not ad:
@@ -32,12 +36,34 @@ def delete_ad(db: Session, ad_id: int):
     db.commit()
     return ad
 
-def search_ads(db: Session, title: str = None, author: str = None):
+
+def search_ads(
+    db: Session,
+    title: str = None,
+    author: str = None,
+    min_price: float = None,
+    max_price: float = None,
+    limit: int = 10,
+    offset: int = 0,
+):
     query = db.query(models.Advertisement)
 
     if title:
         query = query.filter(models.Advertisement.title.ilike(f"%{title}%"))
+
     if author:
         query = query.filter(models.Advertisement.author.ilike(f"%{author}%"))
 
-    return query.all()
+    if min_price is not None:
+        query = query.filter(models.Advertisement.price >= min_price)
+
+    if max_price is not None:
+        query = query.filter(models.Advertisement.price <= max_price)
+
+    total = query.count()
+    ads = query.offset(offset).limit(limit).all()
+
+    return {
+        "total": total,
+        "items": ads
+    }
