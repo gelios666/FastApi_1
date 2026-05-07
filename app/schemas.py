@@ -1,18 +1,18 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, constr
 from datetime import datetime
 from typing import Optional
 
 
 class AdvertisementCreate(BaseModel):
-    title: str
-    description: Optional[str]
+    title: constr(min_length=1)
+    description: Optional[str] = None
     price: float = Field(..., gt=0)
-    author: str
+    author: constr(min_length=1)
 
 
 class AdvertisementUpdate(BaseModel):
-    title: Optional[str]
-    description: Optional[str]
+    title: Optional[constr(min_length=1)] = None
+    description: Optional[str] = None
     price: Optional[float] = Field(None, gt=0)
 
 

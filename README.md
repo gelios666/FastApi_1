@@ -1,166 +1,154 @@
-# FastAPI Ads Service
+FastAPI Advertisement Service
 
 Сервис объявлений купли/продажи, реализованный на FastAPI с использованием PostgreSQL и Docker.
 
----
+📌 Возможности API
 
-## 📌 Описание
+Поддерживаются следующие операции:
+Создание объявления
+Получение объявления по ID
+Обновление объявления
+Удаление объявления
+Поиск объявлений
+Фильтрация по цене
+Пагинация результатов
 
-Приложение предоставляет REST API для работы с объявлениями.
-Поддерживаются базовые CRUD-операции и поиск по параметрам.
+🛠 Используемые технологии
+Python 3.11
+FastAPI
+SQLAlchemy
+PostgreSQL
+Docker
+Docker Compose
+Pydantic
 
----
-
-## ⚙️ Стек технологий
-
-* Python 3.11
-* FastAPI
-* SQLAlchemy
-* PostgreSQL
-* Docker / Docker Compose
-
----
-
-## 🚀 Запуск проекта
-
-### 1. Клонировать репозиторий
-
-```bash
-git clone https://github.com/your-username/fastapi-ads.git
-cd fastapi-ads
-```
-
-### 2. Запустить контейнеры
-
-```bash
-docker compose up --build
-```
-
----
-
-## 🌐 Доступ к API
-
-После запуска приложение доступно по адресу:
-
-```
-http://localhost:8000
-```
-
-Swagger-документация:
-
-```
-http://localhost:8000/docs
-```
-
----
-
-## 📦 Структура проекта
-
-```
+📂 Структура проекта
 .
-├── app/
+├── app
+│   ├── crud.py
+│   ├── database.py
 │   ├── main.py
 │   ├── models.py
-│   ├── schemas.py
-│   ├── database.py
-│   └── crud.py
+│   └── schemas.py
+│
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
 └── README.md
-```
 
----
+🚀 Запуск проекта
+1. Клонирование репозитория
+git clone <repository_url>
+cd FastApi_1
+2. Запуск через Docker
+docker compose up --build
 
-## 📌 API Эндпоинты
+🌐 Swagger документация
+После запуска API будет доступно:
 
-### ➕ Создание объявления
+http://localhost:8000/docs
+🗄 PostgreSQL
 
-```
-POST /advertisement
-```
+Контейнер PostgreSQL запускается автоматически через Docker Compose.
 
-Пример запроса:
+Параметры подключения:
 
-```json
-{
-  "title": "iPhone 15",
-  "description": "Новый",
-  "price": 1000,
-  "author": "Ivan"
-}
-```
+DB: advertisements_db
+USER: postgres
+PASSWORD: postgres
+HOST: db
+PORT: 5432
 
----
-
-### 🔍 Получение объявления
-
-```
-GET /advertisement/{id}
-```
-
----
-
-### ✏️ Обновление объявления
-
-```
-PATCH /advertisement/{id}
-```
-
-Пример:
-
-```json
-{
-  "price": 900
-}
-```
-
----
-
-### ❌ Удаление объявления
-
-```
-DELETE /advertisement/{id}
-```
-
----
-
-### 🔎 Поиск объявлений
-
-```
-GET /advertisement?title=...&author=...
-```
-
-Примеры:
-
-```
-/advertisement?title=iPhone
-/advertisement?author=Ivan
-```
-
----
-
-## 🗄 Модель данных
+📌 Модель объявления
 
 Объявление содержит поля:
 
-* `id` — уникальный идентификатор
-* `title` — заголовок
-* `description` — описание
-* `price` — цена
-* `author` — автор
-* `created_at` — дата создания
+Поле	Тип
+id	integer
+title	string
+description	string
+price	float
+author	string
+created_at	datetime
+📡 API endpoints
+➕ Создание объявления
+POST /advertisement
+Пример запроса
+{
+  "title": "iPhone 15",
+  "description": "New phone",
+  "price": 1000,
+  "author": "Ivan"
+}
+Успешный ответ
+201 Created
+📄 Получение объявления
+GET /advertisement/{id}
+Пример
+GET /advertisement/1
+✏️ Обновление объявления
+PATCH /advertisement/{id}
+Пример запроса
+{
+  "price": 1200
+}
+❌ Удаление объявления
+DELETE /advertisement/{id}
+Успешный ответ
+204 No Content
+🔎 Поиск объявлений
+GET /advertisement
 
----
+Поддерживаются параметры:
 
-## ⚠️ Примечания
+Параметр	Описание
+title	поиск по заголовку
+author	поиск по автору
+min_price	минимальная цена
+max_price	максимальная цена
+limit	количество записей
+offset	смещение
+📌 Примеры поиска
+Поиск по title
+GET /advertisement?title=iphone
+Фильтр по цене
+GET /advertisement?min_price=100&max_price=1000
+Пагинация
+GET /advertisement?limit=5&offset=10
+Комбинированный поиск
+GET /advertisement?title=iphone&author=ivan&min_price=500
+✅ Валидация
 
-* Аутентификация и авторизация не реализованы (не требуются по заданию)
-* База данных автоматически создаётся при запуске
-* При первом запуске Docker может скачивать образы (это нормально)
+API проверяет:
 
----
+обязательные поля
+типы данных
+цену (price > 0)
+пустые строки title/author
 
-## ✅ Готово
+При невалидных данных возвращается:
 
-Проект полностью готов к запуску и тестированию через Swagger UI.
+422 Unprocessable Entity
+🐳 Docker
+
+В проекте используются:
+
+Dockerfile — сборка FastAPI приложения
+docker-compose.yml — запуск API и PostgreSQL
+
+Для PostgreSQL добавлен healthcheck, чтобы приложение запускалось только после готовности базы данных.
+
+📌 Проверка работы
+
+После запуска:
+
+Открыть Swagger:
+
+http://localhost:8000/docs
+Создать объявление
+Проверить:
+получение
+обновление
+удаление
+поиск
+пагинацию
